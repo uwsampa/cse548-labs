@@ -330,6 +330,7 @@ Carefully insert `#pragma HLS PIPELINE II=1` directives in your code to tell HLS
 Report (1) the design latency in cycles, (2) the overall device utilization (as Total per Resource), (3) the number of floating point adders and multipliers (you can find this information under the Instance section of the synthesis report) and (4) the Initiation Interval of the loops you pipelined.
 
 **Hints**:
+* Pragmas should be inserted after the target loop header that you wish to unroll. You can always use the Vivado GUI after compilation with the following command: `vivado_hls -p accel/` to correctly insert pragmas.
 * Chapter 7 of the [Vivado HLS Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug871-vivado-high-level-synthesis-tutorial.pdf) should provide enough guidance on how to do this effectively.
 * Start from the inner-most loop(s) before moving to an outer-loop. Starting at an outer loop will flatten it entirely and your resource usage and compilation time will explode.
 
