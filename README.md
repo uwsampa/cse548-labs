@@ -69,6 +69,8 @@ Make sure to allocate at least 32GB (or 64GB preferably) of disk drive space for
 * SUSE Enterprise Linux 11.4 64-bit
 * Ubuntu Linux 16.04.1 LTS 64-bit
 
+**Note** If you're using VMWare, do not have your source and work directory sit on a shared drive with your host OS. For some reason VMWare directory sharing is slow to update file changes from the host OS to the virtual OS, which can lead to compilation bugs.
+
 ### Vivado HL WebPACK 2017.1
 
 You’ll need to install Xilinx’ FPGA compilation toolchain, [Vivado HL WebPACK 2017.1](https://www.xilinx.com/products/design-tools/vivado.html), which a license-free version of the Vivado HLx toolchain.
@@ -430,8 +432,8 @@ When your design is done compiling, it is ready to be tested on the PYNQ! Let's 
 ```bash
 scp build/export/classifier.bit xilinx@192.168.2.99:/home/xilinx/pynq/bitstream/.
 scp tcl/classifier.tcl xilinx@192.168.2.99:/home/xilinx/pynq/bitstream/.
-scp jupyter/classifier_fp.ipynb xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
-scp jupyter/*.npy xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
+scp jupyter/classifier_1.ipynb xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
+scp python/*.npy xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
 ```
 
 Now log onto your PYNQ board on Chrome by entering the following address: http://192.168.2.99:9090/. Make sure you've properly powered on the board, and connected the board via Ethernet to your host machine. In addition, ensure that you've properly configured your machine's network settings as indicated in the PYNQ getting started guide.
