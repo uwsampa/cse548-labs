@@ -94,7 +94,7 @@ def getDataSet(args, mode):
         # Resize the image
         img = imresize(img, (args.dim, args.dim), interp='bilinear')
         # Reshape
-        datum = img.reshape((args.dim*args.dim,))
+        datum = np.divide(img.reshape((args.dim*args.dim,)), 1)
         # Prepare the labels (one-hot encoded)
         label = np.zeros(10)
         label[lab] = 1.0
@@ -136,23 +136,48 @@ if __name__ == '__main__':
     reg.fit(train_data, train_labels)
 
     # Perform prediction with model
-    predicted_labels = reg.predict(test_data)
+    float_labels = reg.predict(test_data)
 
-    # Measure Validation Error
-    errors = 0
+    # Fixed point computation
+    # CSE 548: Todo: tweak the SCALE to get less than 20% classification error
+    SCALE = 0
+    # CSE 548 - Change me
+    offset = reg.intercept_
+    weight = reg.coef_
+    offset = np.clip(offset*SCALE, -128, 127)
+    offset = offset.astype(np.int32)
+    weight = np.clip(weight*SCALE, -128, 127)
+    weight = weight.astype(np.int8)
+    # Perform fixed-point classification
+    ones = np.ones(len(test_data)).reshape((len(test_data),1))
+    i_p = np.append(ones, test_data, axis=1)
+    w_p = np.append(offset.reshape(10,1), weight, axis=1)
+    fixed_labels = np.dot(i_p, w_p.T)
+
+    # Measure Validation Errors
+    float_errors = 0
     for idx, label in enumerate(test_labels):
-        guess_label = np.argmax(predicted_labels[idx])
+        guess_label = np.argmax(float_labels[idx])
         actual_label = np.argmax(label)
         if (guess_label!=actual_label):
-            errors += 1.
+            float_errors += 1.
+    fixed_errors = 0
+    for idx, label in enumerate(test_labels):
+        guess_label = np.argmax(fixed_labels[idx])
+        actual_label = np.argmax(label)
+        if (guess_label!=actual_label):
+            fixed_errors += 1.
 
     # Produce stats
     print 'Min/Max of coefficient values [{}, {}]'.format(reg.coef_.min(), reg.coef_.max())
     print 'Min/Max of intersect values [{}, {}]'.format(reg.intercept_.min(),reg.intercept_.max())
-    print 'Misclassifications = {0:.2f}%'.format(errors/len(test_labels)*100)
+    print 'Misclassifications (float) = {0:.2f}%'.format(float_errors/len(test_labels)*100)
+    print 'Misclassifications (fixed) = {0:.2f}%'.format(fixed_errors/len(test_labels)*100)
 
     # Dump the model and test data
     np.save('test_data', test_data)
     np.save('test_labels', test_labels)
     np.save('model_weights', reg.coef_)
     np.save('model_offsets', reg.intercept_)
+    np.save('model_weights_fixed', weight)
+    np.save('model_offsets_fixed', offset)
