@@ -123,7 +123,7 @@ Follow the **Getting Started** tutorial to get your Pynq board set up (please re
 
 Try one of the iPython notebook examples available out-of-the-box on your PYNQ board to make sure that it works as intended!
 
-# Part 1: Matrix Multiplication Pipeline Optimization in HLS (60 pts)
+# Part 1: Matrix Multiplication Pipeline Optimization in HLS (50 pts)
 
 This first part will cover fundamentals of high level synthesis. 
 
@@ -380,7 +380,7 @@ Increase the batch size by power of 2 increments until you exceed the FPGA resou
 **What to expect**: Increasing the batch size will amortize the iteration latency of your overall design. Normalized to the batch size, your current design should now see an 86x latency reduction compared to the baseline design and see roughly a 55% `BRAM_18K` utilization.
 
 
-## E. Extending Batch Size with Tiling (20 pts)
+## E. Extending Batch Size with Tiling (10 pts)
 
 This final optimization step should help us decouple the `BRAM_18K` requirements the and batch size of our algorithm. This will allow us to reduce our normalized total latency even further.
 
@@ -441,7 +441,7 @@ scp python/*.npy xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
 
 Now log onto your PYNQ board on Chrome by entering the following address: http://192.168.2.99:9090/. Make sure you've properly powered on the board, and connected the board via Ethernet to your host machine. In addition, ensure that you've properly configured your machine's network settings as indicated in the PYNQ getting started guide.
 
-Use the `xilinx` credentials (pwd: `xilinx`) to log into the iPython notebook server. If the file transfer completed with success, you should see your `classifier_fp.ipynb` program in the jupyter directory tree.
+Use the `xilinx` credentials (pwd: `xilinx`) to log into the iPython notebook server. If the file transfer completed with success, you should see your `classifier_1.ipynb` notebook in the jupyter directory tree.
 
 Click on it to launch the program! You can simply execute the entire program by clicking on **Kernel -> Restart & Run All**.
 
@@ -454,10 +454,72 @@ Report (1) the measured speedup and (2) measured classification accuracy.
 * We are compiling a low frequency (100MHz) which is 1/6.6th of what the CPU is running at. With more frequency optimizations, it's not impossible to clock the FPGA at 250MHz (however this won't be covered during this lab).
 * Lastly we are utilizing less than ~50% of the FPGA resources and only 1/4 of the available memory throughput on the FPGA, so we could potentially improve throughput significantly.
 
-# Part 2: Fixed-Point Optimizations (20 pts)
+# Part 2: Fixed-Point Optimizations (30 pts)
 
-Under construction.
+In Part 1 you implemented an accelerator that performs computation on floating-point data. In Part 2 you'll use a fixed-point implementation that is a lot more compact and efficient.
+
+We'll use `int8` for the weights, and `uint8` for the inputs since those are gray-scale pixels valued between 0 and 255. For the outputs and the offsets, we'll use `int32` values.
+
+You will find under `hls/mmult_fixed/` a source skeletton to implement your fixed-point matrix multiply. To build your bitstream, you'll need to change the following line of `tcl/hts.tcl` from:
+```tcl
+set src_dir "../hls/mmult_float"
+```
+
+to:
+```tcl
+set src_dir "../hls/mmult_fixed"
+```
+
+To test your design on the board, you'll need to transfer your new fixed-point classifier overlay to the PYNQ file system with the following commands:
+```bash
+scp build/export/classifier.bit xilinx@192.168.2.99:/home/xilinx/pynq/bitstream/classifier_fixed.bit
+scp tcl/classifier.tcl xilinx@192.168.2.99:/home/xilinx/pynq/bitstream/classifier_fixed.tcl
+scp jupyter/classifier_2.ipynb xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
+scp python/*.npy xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/.
+```
+
+Finally, once you've logged onto the iPython notebook server on the PYNQ, open the `classifier_2.ipynb` notebook, and execute your test program by clicking on **Kernel -> Restart & Run All**.
+
+### Problem Statement
+
+Implement a fixed-point linear classifier, by completing the `TODOs` in `hls/mmult_fixed/mmult_fixed.cpp` and `hls/mmult_fixed/mmult_fixed.h`. The batch size has been set to `8192` and should not be altered. Your design should pass the tests in `hls/mmult_fixed/mmult_test.cpp`.
+
+You will also have to perform floating-point to fixed-point conversion of your learned weight and offset coefficients. In the training file under `python/mnist.py` modify the `SCALE` factor to achieve less than 20% validation error on fixed point inference. 
+
+Report the following:
+* (1) the fixed-point validation accuracy reported by `mnist.py` after you've tweaked the `SCALE` factor.
+* (2) the design latency in cycles 
+* (3) the overall device utilization (as Total per Resource).
+* (4) your measured system speedup over the fixed-point CPU implementation
+* (5) your measured classification accuracy on the 8k MNIST test sample
+
+Also report the following:
+* (6) how many multipliers are instantiated in your desing?
+* (7) report the initiation interval of the matrix multiplication loop that you pipelined
+* (8) given the number of multipliers in your design and input throughput via the AXI port, is the design bandwidth- or computer-limited?
+
+**Hints**
+* Again you will have to tweak your memory partitioning, tiling factor to optimize your kernel latency/throughput.
+* You'll notice that in `mmult.h` we are using `ap_int` which are arbitrary precision integers, which is HLS' solution to providing integers of arbitrary width (so not just 1, 8, 16, 32, 64). Unfortunately the `union` type conversion trick does not work on `ap_ints`. Instead you'll need to do a bit of bit manipulation on the AXI raw values before converting to `ap_int`. The `mmult_test.cpp` file should provide a good reference on how data is packed and unpacked before being pushed or popped from AXI channels.
+* By default HLS will implement 8-bit multipliers on hard `BRAM_18K` blocks. But the Zynq FPGA only contains 220 multipliers. If you want to allocate more multipliers, you can use the following directive which will tell HLS to synthesize multipliers using LUTs instead: `#pragma HLS RESOURCE variable=mult core=Mul_LUT`.
+
+**What to expect**: In terms of latency as HLS reports, this design should achieve 400-500x improvement in batch-normalized latency over the first naive floating point design. On the board, you should see a roughly 10x improvement over Part 1's  FPGA over CPU speedup.
 
 # Part 3: Open-ended design optimization (20 pts + 20 bonus pts)
 
-Under construction.
+You have now a mature understanding of the process of optimizing hardware, and adapting learning models to more efficiently execute inference on hardware (e.g. fixed point optimization).
+
+### Problem Statement
+
+You are given free range over how to improve either performance or the accuracy or both of your classifier.
+
+You will receive full points if you can both improve performance and accuracy of your classifier by a significant margin (over 85% in accuracy, and achieve less than 4.5ms of FPGA inference time as measured on the board for 8k invocations). You are free to change the classifier algorithm. Bonus points will be awarded to very ambitious classifier implementations (e.g. neural networks).
+
+This goes without saying: you are not allowed to train your model on test data.
+
+**Hints**
+To provide some guidance, you can implement one of the following optimizations:
+* Image resizing to reduce bandwidth constraints
+* Int4 computation to improve overall throughput and compute parallelism
+* Weight re-training to recover accuracy loss
+* Static weight and input pruning to improve throughput
