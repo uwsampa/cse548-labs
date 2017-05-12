@@ -105,6 +105,9 @@ source <install_path>/Vivado/2017.1/settings64.sh
 The PYNQ board website complete with documentation and forums is available [here](http://www.pynq.io/).
 Follow the **Getting Started** tutorial to get your Pynq board set up (please read the notes below first).
 
+**SD card flashing notes**
+* We recommend using [Etcher](https://etcher.io/) for one-step SD-card flashing. You can download the image for the SD card on the PYNQ board [website](http://www.pynq.io/).
+
 **Board setup notes:**
 * Your boot jumper should be set to SD position.
 * Your power jumper should be set to the REG position.
