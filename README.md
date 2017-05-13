@@ -7,15 +7,15 @@ Questions about this assignment should got to the TA, Thierry.
 ### Turnin
 
 You should submit the following files:
-* Your report in `.pdf` format with answers to the questions asked in Parts 1 and 2. In addition, the report should contain a short (couple paragraphs) description of your optimized implementation for Part 3 (what you changed about the hardware, or classifier, or both).
+* Your report in `.pdf` format with concise answers to the questions asked in Parts 1 and 2. In addition, the report should contain a short (couple paragraphs) description of your optimized implementation for Part 3 (what you changed about the hardware, or classifier, or both).
 * Your code implementation of the floating point and fixed point classifiers, gzipped as `src.tar.gz` with the following directory structure (these designs should compile with the `hls.tcl` without errors):
    *  `mmult_float/mmult_float.cpp`
    *  `mmult_float/mmult.h`
    *  `mmult_fixed/mmult_fixed.cpp`
    *  `mmult_fixed/mmult.h`
-* Your optimized implementation source code which includes:
-   * Training scripts/programs for reproducibility (if you changed the classifier)
-   * Your hardware design source (if you changed the hardware source)
+* Your optimized implementation source code, gzipped as `solution.tar.gz` which includes:
+   * Training scripts/programs for reproducibility (if you re-trained or changed the classifier)
+   * Your hardware design source (if you changed the hardware source, as a .cpp and .h file)
    * The `classifier.bit` bitstream and the iPython notebook `classifier.ipynb` to run design on the PYNQ board.
 
 ### Story
