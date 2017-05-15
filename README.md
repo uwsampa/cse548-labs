@@ -502,6 +502,7 @@ Also report the following:
 
 **Hints**
 * Again you will have to tweak your memory partitioning, tiling factor to optimize your kernel latency/throughput.
+* Make sure that you close your AXI stream properly when you push data to it (see `push_stream()` calls in `mmult_float.cpp`). The `bool last` argument should be set to `true` on the last stream packet or the DMA drivers will hang when you try to test your design.
 * You'll notice that in `mmult.h` we are using `ap_int` which are arbitrary precision integers, which is HLS' solution to providing integers of arbitrary width (so not just 1, 8, 16, 32, 64). Unfortunately the `union` type conversion trick does not work on `ap_ints`. Instead you'll need to do a bit of bit manipulation on the AXI raw values before converting to `ap_int`. The `mmult_test.cpp` file should provide a good reference on how data is packed and unpacked before being pushed or popped from AXI channels.
 * By default HLS will implement 8-bit multipliers on hard `BRAM_18K` blocks. But the Zynq FPGA only contains 220 multipliers. If you want to allocate more multipliers, you can use the following directive which will tell HLS to synthesize multipliers using LUTs instead: `#pragma HLS RESOURCE variable=mult core=Mul_LUT`.
 
