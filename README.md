@@ -94,6 +94,8 @@ You’ll need to install Xilinx’ FPGA compilation toolchain, [Vivado HL WebPAC
    * Hit “Install” under the **Installation Summary** screen.
    * An **Installation Progress Window** will pop-up to track progress of the download and the installation.
    * This process will take about 20-30 minutes depending on your connection speed.
+   * A pop-up window will inform you that the installation completed successfully. Click "OK".
+   * Finally the **Vivado License Manager** will launch. Select "Get Free ISE WebPACK, ISE/Vivado IP or PetaLinux License" and click "Connect Now" to complete the license registration process. 
 7. The last step is to update your `~/.bashrc` with the following line:
 ```bash
 # Xilinx Vivado 2017.1 environment
