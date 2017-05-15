@@ -405,7 +405,7 @@ T out_buf[TILE_SIZE][CLASSES];
 ...
 
 // Iterate over tiles
-LT: for (t=0; t<BATCH; BATCH+=TILE_SIZE)
+LT: for (t=0; t<BATCH; t+=TILE_SIZE)
 	// Load input tile
     ...
     // Perform matrix multiplication on input tile
