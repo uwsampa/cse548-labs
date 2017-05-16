@@ -1,6 +1,6 @@
 # Lab 3: Custom Acceleration with FPGAs
 
-**Due** Wednesday May 24rd at 23:59 via the Catalyst dropbox.
+**Due** Wednesday May 24th at 23:59 via the Catalyst dropbox.
 
 Questions about this assignment should got to the TA, Thierry.
 
