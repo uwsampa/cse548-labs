@@ -108,15 +108,15 @@ int main(void)
 		for(int j=0; j<CLASSES-OUT_WIDTH_RATIO; j+=OUT_WIDTH_RATIO) {
 			axi_T packet = pop_stream(out_stream[os_idx++]);
 			UNPACK_OUT: for (int w = 0; w < OUT_WIDTH_RATIO; w++) {
-				out_bit_T bits = (packet>>(w*OUT_WIDTH)) & ((1ULL<<OUT_WIDTH)-1);
-				output_hw[i][j+w] = *((out_T*) &bits);
+				out_bit_T bits = (packet>>(w*OUT_WIDTH));
+				output_hw[i][j+w] = *((out_T*) &bits) & ((1ULL<<OUT_WIDTH)-1);
 			}
 		}
 		// Pop last AXI data packet
 		axi_T packet = pop_stream(out_stream[os_idx++]);
 		FINISH_OUT: for (int j = CLASSES-OUT_WIDTH_RATIO; j < CLASSES; j++) {
-			out_bit_T bits = (packet>>((j%OUT_WIDTH_RATIO)*OUT_WIDTH)) & ((1ULL<<OUT_WIDTH)-1);
-			output_hw[i][j] = *((out_T*) &bits);
+			out_bit_T bits = (packet>>((j%OUT_WIDTH_RATIO)*OUT_WIDTH));
+			output_hw[i][j] = *((out_T*) &bits) & ((1ULL<<OUT_WIDTH)-1);
 		}
 	}
 
