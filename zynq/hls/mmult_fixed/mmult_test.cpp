@@ -37,7 +37,7 @@ int main(void)
 
 	for(i = 0; i<CLASSES; i++) {
 		for(j = 0; j<FEAT; j++) {
-			weights[i][j] = (w_T) ((rand()%(1ULL<<W_WIDTH)) - (1ULL<<(OUT_WIDTH-1)));
+			weights[i][j] = (w_T) ((rand()%(1ULL<<W_WIDTH)) - (1ULL<<(W_WIDTH-1)));
 		}
 	}
 
