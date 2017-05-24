@@ -486,7 +486,7 @@ Finally, once you've logged onto the iPython notebook server on the PYNQ, open t
 
 Implement a fixed-point linear classifier, by completing the `TODOs` in `hls/mmult_fixed/mmult_fixed.cpp` and `hls/mmult_fixed/mmult_fixed.h`. The batch size has been set to `8192` and should not be altered. Your design should pass the tests in `hls/mmult_fixed/mmult_test.cpp`.
 
-You will also have to perform floating-point to fixed-point conversion of your learned weight and offset coefficients. In the training file under `python/mnist.py` modify the `SCALE` factor to achieve less than 20% validation error on fixed point inference. Re-running the `python/mnist.py` will produce updated `.npy` files that will then be copied onto the Zynq when you re-run the `scp` commands.
+You will also have to perform floating-point to fixed-point conversion of your learned weight and offset coefficients. In the training file under `python/mnist.py` modify the `SCALE` factor to achieve less than 20% validation error on fixed point inference. Executing `python mnist.py` from the `python/` directory will produce updated `.npy` files that will then be copied onto the Zynq when you re-run the `scp` commands.
 
 Report the following:
 * (1) the fixed-point validation accuracy reported by `mnist.py` after you've tweaked the `SCALE` factor.
