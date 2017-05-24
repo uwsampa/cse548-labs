@@ -518,7 +518,7 @@ You are given free range over how to improve either performance or the accuracy 
 
 **Grading breakdown**
 * You will receive full points if you can both improve performance and accuracy of your classifier by a significant margin (over 85% in accuracy, and achieve less than 4.5ms of FPGA inference time as measured on the board for 8k invocations). You are free to change the classifier algorithm. 
-* You will receive 15 points for achieving either the accuracy target or the performance target (with reasonable performance or accuracy degradation respectively, e.g. you get credit for a 10x speedup if accuracy is 50%).
+* You will receive 15 points for achieving either the accuracy target or the performance target (with reasonable performance or accuracy degradation respectively, e.g. you get won't get full credit if you improve performance at the detriment of too much accuracy degradation, or vice versa).
 * Partial grades will be awarded if neither goals are achieved.
 * Bonus points will be awarded to very ambitious classifier implementations (e.g. neural networks).
 
