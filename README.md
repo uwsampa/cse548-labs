@@ -514,15 +514,18 @@ You have now a mature understanding of the process of optimizing hardware, and a
 
 ### Problem Statement
 
-You are given free range over how to improve either performance or the accuracy or both of your classifier.
+You are given free range over how to improve either performance or the accuracy or both of your classifier. It goes without saying that you are not allowed to train your model on test data to improve on accuracy.
 
-You will receive full points if you can both improve performance and accuracy of your classifier by a significant margin (over 85% in accuracy, and achieve less than 4.5ms of FPGA inference time as measured on the board for 8k invocations). You are free to change the classifier algorithm. Bonus points will be awarded to very ambitious classifier implementations (e.g. neural networks).
-
-This goes without saying: you are not allowed to train your model on test data.
+**Grading breakdown**
+* You will receive full points if you can both improve performance and accuracy of your classifier by a significant margin (over 85% in accuracy, and achieve less than 4.5ms of FPGA inference time as measured on the board for 8k invocations). You are free to change the classifier algorithm. 
+* You will receive 15 points for achieving either the accuracy target or the performance target (with reasonable performance or accuracy degradation respectively, e.g. you get credit for a 10x speedup if accuracy is 50%).
+* Partial grades will be awarded if neither goals are achieved.
+* Bonus points will be awarded to very ambitious classifier implementations (e.g. neural networks).
 
 **Hints**
 To provide some guidance, you can implement one of the following optimizations:
 * Image resizing to reduce bandwidth constraints
 * Int4 computation to improve overall throughput and compute parallelism
-* Weight re-training to recover accuracy loss
 * Static weight and input pruning to improve throughput
+* Tweaking the classifier parameters (alpha, normalize, solver etc.) to minimize the impact of quantization after training: http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+* Quantized training of Perceptrons or MLPs to greatly improve on accuracy (hard): you can try using Tensorflow's [quantized neural network training framework](https://www.tensorflow.org/performance/quantization) based on Google's [gemmlowp](https://github.com/google/gemmlowp)
