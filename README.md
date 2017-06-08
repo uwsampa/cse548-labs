@@ -1,6 +1,6 @@
 # Lab 3: Custom Acceleration with FPGAs
 
-**Due** Wednesday May 24rd at 23:59 via the Catalyst dropbox.
+**Due** Wednesday May 24th at 23:59 via the Catalyst dropbox.
 
 Questions about this assignment should got to the TA, Thierry.
 
@@ -145,14 +145,14 @@ A standard matrix multiply algorithm in C++ is described below (**we assume that
 // Standard Matrix Multiply/Linear Classifier algorithm (on in_buf and transposed w_buf to produce out_buf)
 L1: for (int i = 0; i < BATCH; i++)
 {
-	L2: for (int j = 0; j < CLASSES; j++)
+    L2: for (int j = 0; j < CLASSES; j++)
     {
-		// Perform the dot product in the inner loop
-		float tmp = offset_buf[j];
-		L3: for(int k = 0; k < FEAT; k++)
+        // Perform the dot product in the inner loop
+        float tmp = offset_buf[j];
+        L3: for(int k = 0; k < FEAT; k++)
         {
-			tmp += in_buf[i][k] * weight_buf[j][k];
-		}
+            tmp += in_buf[i][k] * weight_buf[j][k];
+	}
         out_buf[i][j] = tmp;
     }
 }
@@ -175,46 +175,49 @@ In order to interface with the input and output AXI streams, we've provided two 
 void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE]) {
 	
     // Hardware buffers
-	float offset_buf[CLASSES];
-	float weight_buf[CLASSES][FEAT];
-	float in_buf[BATCHES][FEAT];
-	float out_buf[BATCHES][CLASSES];
+    float offset_buf[CLASSES];
+    float weight_buf[CLASSES][FEAT];
+    float in_buf[BATCHES][FEAT];
+    float out_buf[BATCHES][CLASSES];
     
-	// Input and output AXI stream indices
-	int is_idx = 0;
-	int os_idx = 0;
+    // Input and output AXI stream indices
+    int is_idx = 0;
+    int os_idx = 0;
 
-	// Stream data into offset_buf
-	LOAD_OFF: for (int i = 0; i < CLASSES; i++) {
-		// Pop data from stream
-		offset_buf[i] = pop_stream(in_stream[is_idx++]);
-	}
+    // Stream data into offset_buf
+    LOAD_OFF: for (int i = 0; i < CLASSES; i++) {
+        // Pop data from stream
+        offset_buf[i] = pop_stream(in_stream[is_idx++]);
+    }
 	
     // Stream data into weight_buf
-	LOAD_W_1: for (int i = 0; i < CLASSES; i++) {
-		LOAD_W_2: for (int j = 0; j < FEAT; j++) {
-		// Pop data from stream
-		weight_buf[i][j] = pop_stream(in_stream[is_idx++]);
-	}
+    LOAD_W_1: for (int i = 0; i < CLASSES; i++) {
+        LOAD_W_2: for (int j = 0; j < FEAT; j++) {
+            // Pop data from stream
+            weight_buf[i][j] = pop_stream(in_stream[is_idx++]);
+        }
+    }
     
     // Stream data into in_buf
-	LOAD_I_1: for (int i = 0; i < BATCH; i++) {
-		LOAD_I_2: for (int j = 0; j < FEAT; j++) {
-		// Pop data from stream
-		in_buf[i][j] = pop_stream(in_stream[is_idx++]);
+    LOAD_I_1: for (int i = 0; i < BATCH; i++) {
+        LOAD_I_2: for (int j = 0; j < FEAT; j++) {
+            // Pop data from stream
+            in_buf[i][j] = pop_stream(in_stream[is_idx++]);
 	}
+    }
     
     // Do Matrix Multiplication
     ...
     
     
     // Stream data out of out_buf
-	STORE_O_1: for (int i = 0; i < BATCH; i++) {
-		STORE_O_2: for (int j = 0; j < CLASSES; j++) {
-		// Push output element into AXI stream
-        // push_stream's second argument should be set to True when sending the last packet out
-		out_stream[os_idx] = push_stream(out_buf[i][j], os_idx++ == (BATCH*CLASSES-1));
+    STORE_O_1: for (int i = 0; i < BATCH; i++) {
+        STORE_O_2: for (int j = 0; j < CLASSES; j++) {
+            // Push output element into AXI stream
+            // push_stream's second argument should be set to True when sending the last packet out
+            out_stream[os_idx] = push_stream(out_buf[i][j], os_idx++ == (BATCH*CLASSES-1));
 	}
+    }
 }
 ```
 
@@ -225,22 +228,22 @@ In order to handle data type conversions you can use a `union`. The code below s
 ```c++
 union
 {
-	axi_T packet;
-	struct {float in_0; float in_1;} val;
+    axi_T packet;
+    struct {float in_0; float in_1;} val;
 } converter;
 
 ...
 
 // Stream data into w_buf
 LOAD_W_1: for (int i = 0; i < CLASSES; i++) {
-	// Increment by 2 (ratio between AXI bus width and float width)
-	LOAD_W_2: for (int j = 0; j < FEAT; j+=2) {
-		// Pop data from stream
-		int k = i*FEAT+j;
-    	converter.packet = pop_stream(in_stream[k]);
-		w_buf[i][j+0] = converter.val.in_0;
-		w_buf[i][j+1] = converter.val.in_1;
-	}
+    // Increment by 2 (ratio between AXI bus width and float width)
+    LOAD_W_2: for (int j = 0; j < FEAT; j+=2) {
+        // Pop data from stream
+        int k = i*FEAT+j;
+        converter.packet = pop_stream(in_stream[k]);
+        w_buf[i][j+0] = converter.val.in_0;
+        w_buf[i][j+1] = converter.val.in_1;
+    }
 }
 ```
 
@@ -406,10 +409,10 @@ T out_buf[TILE_SIZE][CLASSES];
 
 // Iterate over tiles
 LT: for (t=0; t<BATCH; t+=TILE_SIZE)
-	// Load input tile
+    // Load input tile
     ...
     // Perform matrix multiplication on input tile
-	...
+    ...
     // Store output tile
 ```
 
@@ -498,7 +501,7 @@ Report the following:
 Also report the following:
 * (6) how many multipliers are instantiated in your desing?
 * (7) report the initiation interval of the matrix multiplication loop that you pipelined
-* (8) given the number of multipliers in your design and input throughput via the AXI port, is the design bandwidth- or computer-limited?
+* (8) given the number of multipliers in your design and input throughput via the AXI port, is the design bandwidth- or compute-limited?
 
 **Hints**
 * Again you will have to tweak your memory partitioning, tiling factor to optimize your kernel latency/throughput.
